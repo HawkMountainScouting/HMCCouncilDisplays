@@ -9,10 +9,10 @@
   <style>
     :root {
       --bg: #081710;
-      --panel: rgba(255,255,255,0.075);
-      --panel-border: rgba(255,255,255,0.12);
+      --panel: rgba(255,255,255,0.11);
+      --panel-border: rgba(255,255,255,0.19);
       --text: #f5f7f5;
-      --muted: #b8c6bd;
+      --muted: #d0d8d3;
       --accent: #e6b94b;
       --safe: #88c999;
       --warning: #f1c75b;
@@ -155,6 +155,19 @@
       margin-top: 1vh;
     }
 
+    .feels-like {
+      margin-top: .55vh;
+      font-size: clamp(16px, 1.25vw, 25px);
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    #feelsLike {
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 1.25em;
+    }
+
     #currentDetail {
       color: var(--muted);
       font-size: clamp(14px, 1.12vw, 22px);
@@ -182,7 +195,7 @@
     }
 
     .forecast-item {
-      background: rgba(0,0,0,.16);
+      background: rgba(255,255,255,.055);
       border-radius: 18px;
       padding: 2vh 1vw;
       display: flex;
@@ -262,7 +275,7 @@
       display: flex;
       justify-content: space-between;
       align-items: end;
-      color: rgba(255,255,255,.54);
+      color: rgba(255,255,255,.68);
       font-size: clamp(10px, .72vw, 15px);
       padding-top: 1vh;
     }
@@ -305,6 +318,7 @@
         </div>
 
         <div id="condition">Loading weather…</div>
+        <div class="feels-like">Feels Like <span id="feelsLike">--°</span></div>
       </div>
 
       <div id="currentDetail">
@@ -470,6 +484,23 @@
         ? Math.round(obs.relativeHumidity.value)
         : null;
 
+    const heatIndexF =
+      obs?.heatIndex?.value !== null && obs?.heatIndex?.value !== undefined
+        ? cToF(obs.heatIndex.value)
+        : null;
+
+    const windChillF =
+      obs?.windChill?.value !== null && obs?.windChill?.value !== undefined
+        ? cToF(obs.windChill.value)
+        : null;
+
+    const feelsLikeF =
+      heatIndexF !== null
+        ? heatIndexF
+        : windChillF !== null
+          ? windChillF
+          : tempF;
+
     const windMps = obs?.windSpeed?.value;
     const windMph =
       windMps !== null && windMps !== undefined
@@ -480,6 +511,11 @@
 
     $("temperature").innerHTML =
       `${tempF ?? "--"}<span class="degree">°</span>`;
+
+    $("feelsLike").textContent =
+      feelsLikeF !== null && feelsLikeF !== undefined
+        ? `${feelsLikeF}°`
+        : "--°";
 
     $("condition").textContent = description;
     $("currentIcon").textContent =
