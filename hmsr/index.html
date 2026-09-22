@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>HMSR Weather</title>
+
+  <style>
+    :root {
+      --bg: #081710;
+      --panel: rgba(255,255,255,0.075);
+      --panel-border: rgba(255,255,255,0.12);
+      --text: #f5f7f5;
+      --muted: #b8c6bd;
+      --accent: #e6b94b;
+      --safe: #88c999;
+      --warning: #f1c75b;
+      --danger: #ef7777;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 80% 0%, rgba(61,114,75,.35), transparent 34%),
+        linear-gradient(145deg, #07140d, #10271a 55%, #08160f);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      padding: 3.2vh 4vw 2.3vh;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 3vw;
+      margin-bottom: 2.4vh;
+    }
+
+    .eyebrow {
+      font-size: clamp(14px, 1.25vw, 25px);
+      letter-spacing: .20em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 800;
+      margin-bottom: .55vh;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 3.3vw, 68px);
+      line-height: .98;
+      letter-spacing: -.025em;
+    }
+
+    .location {
+      color: var(--muted);
+      margin-top: .8vh;
+      font-size: clamp(14px, 1.15vw, 23px);
+    }
+
+    .clock {
+      text-align: right;
+      min-width: 240px;
+    }
+
+    #time {
+      font-weight: 800;
+      font-size: clamp(28px, 3vw, 60px);
+      line-height: 1;
+    }
+
+    #date {
+      color: var(--muted);
+      font-size: clamp(13px, 1.05vw, 21px);
+      margin-top: .55vh;
+    }
+
+    main {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1.08fr 1.92fr;
+      grid-template-rows: minmax(0, 1fr) auto;
+      gap: 2vh 1.6vw;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 18px 50px rgba(0,0,0,.20);
+    }
+
+    .current {
+      padding: 3vh 2.4vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 0;
+    }
+
+    .now-label {
+      color: var(--muted);
+      font-size: clamp(13px, 1vw, 20px);
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: .14em;
+    }
+
+    .current-main {
+      display: flex;
+      align-items: center;
+      gap: 1.2vw;
+      margin: 1.5vh 0;
+    }
+
+    .weather-icon {
+      font-size: clamp(62px, 7vw, 135px);
+      line-height: 1;
+      width: 7.2vw;
+      min-width: 84px;
+      text-align: center;
+    }
+
+    #temperature {
+      font-size: clamp(72px, 8.5vw, 170px);
+      font-weight: 800;
+      letter-spacing: -.06em;
+      line-height: .85;
+    }
+
+    #temperature .degree {
+      font-size: .45em;
+      vertical-align: top;
+      position: relative;
+      top: .08em;
+      margin-left: .04em;
+    }
+
+    #condition {
+      font-size: clamp(20px, 1.8vw, 36px);
+      font-weight: 700;
+      margin-top: 1vh;
+    }
+
+    #currentDetail {
+      color: var(--muted);
+      font-size: clamp(14px, 1.12vw, 22px);
+      line-height: 1.6;
+    }
+
+    .forecast-wrap {
+      padding: 2.5vh 1.8vw 2.2vh;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .section-title {
+      margin: 0 0 1.7vh;
+      font-size: clamp(18px, 1.4vw, 28px);
+    }
+
+    #forecast {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1vw;
+      min-height: 0;
+    }
+
+    .forecast-item {
+      background: rgba(0,0,0,.16);
+      border-radius: 18px;
+      padding: 2vh 1vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .forecast-name {
+      font-size: clamp(14px, 1.08vw, 21px);
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .forecast-icon {
+      font-size: clamp(37px, 4vw, 78px);
+      margin: 1.4vh 0 .7vh;
+      line-height: 1;
+    }
+
+    .forecast-temp {
+      font-size: clamp(30px, 2.8vw, 56px);
+      font-weight: 800;
+    }
+
+    .forecast-desc {
+      color: var(--muted);
+      margin-top: .7vh;
+      font-size: clamp(12px, .9vw, 18px);
+      line-height: 1.25;
+      max-width: 15ch;
+    }
+
+    .alert {
+      grid-column: 1 / -1;
+      padding: 1.45vh 1.6vw;
+      display: flex;
+      align-items: center;
+      gap: 1vw;
+      border-radius: 18px;
+      font-weight: 750;
+      font-size: clamp(14px, 1.1vw, 22px);
+      min-height: 58px;
+    }
+
+    .alert.safe {
+      background: rgba(80,150,96,.16);
+      border: 1px solid rgba(136,201,153,.32);
+      color: #daf2df;
+    }
+
+    .alert.warning {
+      background: rgba(182,113,35,.23);
+      border: 1px solid rgba(241,199,91,.48);
+      color: #ffe8a8;
+    }
+
+    .alert.danger {
+      background: rgba(176,50,50,.28);
+      border: 1px solid rgba(239,119,119,.55);
+      color: #ffd1d1;
+    }
+
+    .alert-symbol {
+      font-size: 1.5em;
+      flex: 0 0 auto;
+    }
+
+    footer {
+      height: 3.7vh;
+      min-height: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      color: rgba(255,255,255,.54);
+      font-size: clamp(10px, .72vw, 15px);
+      padding-top: 1vh;
+    }
+
+    #status.error { color: #ffb5b5; }
+
+    @media (max-width: 950px) {
+      body { padding: 24px; overflow: auto; }
+      html, body { min-height: 100%; height: auto; }
+      main { grid-template-columns: 1fr; }
+      #forecast { grid-template-columns: repeat(2, 1fr); }
+      .alert { grid-column: 1; }
+      .clock { min-width: auto; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div>
+      <div class="eyebrow">Hawk Mountain Scout Reservation</div>
+      <h1>Camp Weather</h1>
+      <div class="location">Schuylkill Haven, Pennsylvania</div>
+    </div>
+
+    <div class="clock">
+      <div id="time">--:--</div>
+      <div id="date">Loading…</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="card current">
+      <div>
+        <div class="now-label">Current Conditions</div>
+
+        <div class="current-main">
+          <div id="currentIcon" class="weather-icon">🌤️</div>
+          <div id="temperature">--<span class="degree">°</span></div>
+        </div>
+
+        <div id="condition">Loading weather…</div>
+      </div>
+
+      <div id="currentDetail">
+        Wind -- · Humidity -- · Updated --
+      </div>
+    </section>
+
+    <section class="card forecast-wrap">
+      <h2 class="section-title">Upcoming Forecast</h2>
+      <div id="forecast"></div>
+    </section>
+
+    <section id="alertBox" class="alert safe">
+      <div class="alert-symbol">✓</div>
+      <div id="alertText">Checking National Weather Service alerts…</div>
+    </section>
+  </main>
+
+  <footer>
+    <div>Weather data: National Weather Service</div>
+    <div id="status">Connecting…</div>
+  </footer>
+
+<script>
+  // ============================
+  // HMSR DASHBOARD CONFIGURATION
+  // ============================
+
+  // Coordinates published for Hawk Mountain Scout Reservation event listings.
+  const LAT = 40.5447208;
+  const LON = -76.2276016;
+
+  // Refresh weather every 10 minutes.
+  const WEATHER_REFRESH_MS = 10 * 60 * 1000;
+
+  // Refresh alerts every 2 minutes.
+  // NWS asks alert API users not to request more often than every 30 seconds.
+  const ALERT_REFRESH_MS = 2 * 60 * 1000;
+
+  const $ = (id) => document.getElementById(id);
+
+  function updateClock() {
+    const now = new Date();
+
+    $("time").textContent = now.toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit"
+    });
+
+    $("date").textContent = now.toLocaleDateString([], {
+      weekday: "long",
+      month: "long",
+      day: "numeric"
+    });
+  }
+
+  function weatherEmoji(text, isDaytime = true) {
+    const s = (text || "").toLowerCase();
+
+    if (s.includes("thunder") || s.includes("t-storm")) return "⛈️";
+    if (s.includes("snow") || s.includes("blizzard")) return "❄️";
+    if (s.includes("sleet") || s.includes("ice") || s.includes("freezing")) return "🌨️";
+    if (s.includes("rain") || s.includes("shower") || s.includes("drizzle")) return "🌧️";
+    if (s.includes("fog") || s.includes("mist") || s.includes("haze")) return "🌫️";
+    if (s.includes("mostly cloudy") || s.includes("cloudy") || s.includes("overcast")) return "☁️";
+    if (s.includes("partly cloudy") || s.includes("partly sunny")) return isDaytime ? "⛅" : "☁️";
+    if (s.includes("sunny") || s.includes("clear")) return isDaytime ? "☀️" : "🌙";
+
+    return isDaytime ? "🌤️" : "🌙";
+  }
+
+  function cToF(c) {
+    if (c === null || c === undefined) return null;
+    return Math.round((c * 9 / 5) + 32);
+  }
+
+  function formatWindDirection(deg) {
+    if (deg === null || deg === undefined || Number.isNaN(deg)) return "";
+    const dirs = ["N","NE","E","SE","S","SW","W","NW"];
+    return dirs[Math.round(deg / 45) % 8];
+  }
+
+  async function getJSON(url) {
+    const response = await fetch(url, {
+      headers: {
+        "Accept": "application/geo+json"
+      },
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    return response.json();
+  }
+
+  async function loadWeather() {
+    try {
+      $("status").classList.remove("error");
+      $("status").textContent = "Updating weather…";
+
+      // 1) Ask NWS which forecast grid and observation stations cover HMSR.
+      const point = await getJSON(`https://api.weather.gov/points/${LAT},${LON}`);
+
+      const forecastURL = point.properties.forecast;
+      const hourlyURL = point.properties.forecastHourly;
+      const stationsURL = point.properties.observationStations;
+
+      // 2) Fetch forecast, hourly forecast, and station list.
+      const [forecastData, hourlyData, stationsData] = await Promise.all([
+        getJSON(forecastURL),
+        getJSON(hourlyURL),
+        getJSON(stationsURL)
+      ]);
+
+      const hourly = hourlyData.properties.periods?.[0];
+
+      // 3) Get nearest reporting station's latest observation.
+      let observation = null;
+
+      if (stationsData.features && stationsData.features.length) {
+        const stationID = stationsData.features[0].properties.stationIdentifier;
+
+        try {
+          const obsData = await getJSON(
+            `https://api.weather.gov/stations/${stationID}/observations/latest`
+          );
+          observation = obsData.properties;
+        } catch (e) {
+          console.warn("Observation unavailable; using hourly forecast.", e);
+        }
+      }
+
+      renderCurrent(observation, hourly);
+      renderForecast(forecastData.properties.periods || []);
+
+      $("status").textContent =
+        "Updated " +
+        new Date().toLocaleTimeString([], {hour: "numeric", minute: "2-digit"});
+
+    } catch (error) {
+      console.error(error);
+      $("status").textContent = "Weather connection unavailable — retrying";
+      $("status").classList.add("error");
+    }
+  }
+
+  function renderCurrent(obs, hourly) {
+    const tempF =
+      obs?.temperature?.value !== null && obs?.temperature?.value !== undefined
+        ? cToF(obs.temperature.value)
+        : hourly?.temperature;
+
+    const description =
+      obs?.textDescription ||
+      hourly?.shortForecast ||
+      "Weather unavailable";
+
+    const humidity =
+      obs?.relativeHumidity?.value !== null &&
+      obs?.relativeHumidity?.value !== undefined
+        ? Math.round(obs.relativeHumidity.value)
+        : null;
+
+    const windMps = obs?.windSpeed?.value;
+    const windMph =
+      windMps !== null && windMps !== undefined
+        ? Math.round(windMps * 2.23694)
+        : null;
+
+    const windDir = formatWindDirection(obs?.windDirection?.value);
+
+    $("temperature").innerHTML =
+      `${tempF ?? "--"}<span class="degree">°</span>`;
+
+    $("condition").textContent = description;
+    $("currentIcon").textContent =
+      weatherEmoji(description, hourly?.isDaytime !== false);
+
+    const details = [];
+
+    if (windMph !== null) {
+      details.push(`Wind ${windDir ? windDir + " " : ""}${windMph} mph`);
+    } else if (hourly?.windSpeed) {
+      details.push(`Wind ${hourly.windDirection || ""} ${hourly.windSpeed}`.trim());
+    }
+
+    if (humidity !== null) {
+      details.push(`Humidity ${humidity}%`);
+    }
+
+    const updatedTime = obs?.timestamp
+      ? new Date(obs.timestamp)
+      : new Date();
+
+    details.push(
+      `Observed ${updatedTime.toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit"
+      })}`
+    );
+
+    $("currentDetail").textContent = details.join("  ·  ");
+  }
+
+  function renderForecast(periods) {
+    const forecast = $("forecast");
+    forecast.innerHTML = "";
+
+    // First four NWS forecast periods = roughly next two days.
+    periods.slice(0, 4).forEach((period) => {
+      const item = document.createElement("div");
+      item.className = "forecast-item";
+
+      item.innerHTML = `
+        <div class="forecast-name">${escapeHTML(period.name)}</div>
+        <div class="forecast-icon">
+          ${weatherEmoji(period.shortForecast, period.isDaytime)}
+        </div>
+        <div class="forecast-temp">${period.temperature}°</div>
+        <div class="forecast-desc">${escapeHTML(period.shortForecast)}</div>
+      `;
+
+      forecast.appendChild(item);
+    });
+  }
+
+  async function loadAlerts() {
+    const alertBox = $("alertBox");
+    const alertText = $("alertText");
+
+    try {
+      const data = await getJSON(
+        `https://api.weather.gov/alerts/active?point=${LAT},${LON}`
+      );
+
+      const alerts = data.features || [];
+
+      if (!alerts.length) {
+        alertBox.className = "alert safe";
+        alertBox.querySelector(".alert-symbol").textContent = "✓";
+        alertText.textContent =
+          "No active National Weather Service alerts for Hawk Mountain Scout Reservation.";
+        return;
+      }
+
+      const severityRank = {
+        Extreme: 4,
+        Severe: 3,
+        Moderate: 2,
+        Minor: 1,
+        Unknown: 0
+      };
+
+      alerts.sort(
+        (a, b) =>
+          (severityRank[b.properties.severity] || 0) -
+          (severityRank[a.properties.severity] || 0)
+      );
+
+      const primary = alerts[0].properties;
+      const severe =
+        primary.severity === "Extreme" ||
+        primary.severity === "Severe";
+
+      alertBox.className = severe ? "alert danger" : "alert warning";
+      alertBox.querySelector(".alert-symbol").textContent = "⚠";
+      alertText.textContent =
+        alerts.length > 1
+          ? `${primary.event} — plus ${alerts.length - 1} additional active alert${alerts.length > 2 ? "s" : ""}.`
+          : `${primary.event}: ${primary.headline || "Active weather alert."}`;
+
+    } catch (error) {
+      console.error(error);
+      alertBox.className = "alert warning";
+      alertBox.querySelector(".alert-symbol").textContent = "!";
+      alertText.textContent =
+        "Unable to verify National Weather Service alerts right now.";
+    }
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  loadWeather();
+  loadAlerts();
+
+  setInterval(loadWeather, WEATHER_REFRESH_MS);
+  setInterval(loadAlerts, ALERT_REFRESH_MS);
+</script>
+</body>
+</html>
