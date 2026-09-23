@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HMSR S'mores Supply Calculator</title>
+<style>
+:root{--bg1:#0b1d13;--bg2:#173522;--panel:rgba(255,255,255,.11);--panel2:rgba(255,255,255,.065);--border:rgba(255,255,255,.18);--text:#f5f7f5;--muted:#d0d8d3;--accent:#e6b94b;--good:#bfe4c8}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:radial-gradient(circle at 85% 0%,rgba(69,128,87,.48),transparent 34%),linear-gradient(145deg,var(--bg1),var(--bg2) 58%,#0d2116);padding:28px}
+.wrap{max-width:980px;margin:0 auto}
+.eyebrow{color:var(--accent);text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:14px;margin-bottom:8px}
+h1{margin:0;font-size:clamp(32px,5vw,58px);line-height:1;letter-spacing:-.03em}
+.subtitle{color:var(--muted);margin-top:10px;font-size:17px;line-height:1.45}
+.grid{display:grid;grid-template-columns:1fr 1.35fr;gap:20px;margin-top:28px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:24px;padding:24px}
+.card h2{margin:0 0 18px;font-size:22px}
+.field{margin-bottom:18px}
+label{display:block;font-weight:800;margin-bottom:7px;color:var(--muted)}
+input{width:100%;border:1px solid var(--border);background:rgba(0,0,0,.16);color:var(--text);padding:14px 16px;border-radius:14px;font-size:22px;font-weight:800;outline:none}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(230,185,75,.15)}
+.total-box{margin-top:10px;padding:18px;border-radius:18px;background:rgba(230,185,75,.12);border:1px solid rgba(230,185,75,.28)}
+.total-label{color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-size:12px;font-weight:800}
+.total-number{font-size:54px;line-height:1;font-weight:900;color:var(--accent);margin-top:4px}
+.total-caption{margin-top:6px;color:var(--muted)}
+.results{display:grid;gap:14px}
+.result{background:var(--panel2);border:1px solid var(--border);border-radius:18px;padding:18px;display:grid;grid-template-columns:56px 1fr auto;gap:14px;align-items:center}
+.icon{font-size:34px;text-align:center}
+.result-title{font-size:18px;font-weight:850}
+.math{color:var(--muted);margin-top:5px;font-size:14px;line-height:1.35}
+.qty{text-align:right;min-width:110px}
+.qty strong{display:block;color:var(--accent);font-size:34px;line-height:1}
+.qty span{display:block;margin-top:5px;color:var(--muted);font-size:13px}
+.assumptions{margin-top:20px;padding:18px 20px;border-radius:18px;background:rgba(0,0,0,.12);border:1px solid var(--border);color:var(--muted);line-height:1.55;font-size:14px}
+.assumptions strong{color:var(--text)}
+.note{margin-top:16px;color:var(--good);font-size:14px;font-weight:700}
+button{margin-top:14px;width:100%;border:1px solid var(--border);background:rgba(255,255,255,.07);color:var(--text);border-radius:14px;padding:12px 16px;font-size:15px;font-weight:800;cursor:pointer}
+footer{margin-top:20px;color:rgba(255,255,255,.55);font-size:12px;text-align:center}
+@media(max-width:760px){body{padding:18px}.grid{grid-template-columns:1fr}.result{grid-template-columns:44px 1fr}.qty{grid-column:2;text-align:left}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="eyebrow">Hawk Mountain Scout Reservation</div>
+<h1>S'mores Supply Calculator</h1>
+<div class="subtitle">Enter youth and adults attending. The calculator provides one s'more per person and always rounds package quantities up.</div>
+
+<div class="grid">
+<section class="card">
+<h2>Weekend Attendance</h2>
+<div class="field"><label for="youth">Youth attending</label><input id="youth" type="number" min="0" step="1" value="24"></div>
+<div class="field"><label for="adults">Adults attending</label><input id="adults" type="number" min="0" step="1" value="8"></div>
+<div class="total-box">
+<div class="total-label">S'mores needed</div>
+<div class="total-number" id="total">32</div>
+<div class="total-caption">1 s'more per person</div>
+</div>
+<button id="reset" type="button">Reset for next group</button>
+</section>
+
+<section class="card">
+<h2>Give This Unit</h2>
+<div class="results">
+
+<div class="result">
+<div class="icon">☁️</div>
+<div><div class="result-title">12 oz Marshmallow Bags</div><div class="math" id="marshMath"></div></div>
+<div class="qty"><strong id="marshQty"></strong><span id="marshCoverage"></span></div>
+</div>
+
+<div class="result">
+<div class="icon">🍪</div>
+<div><div class="result-title">Graham Cracker Boxes</div><div class="math" id="grahamMath"></div></div>
+<div class="qty"><strong id="grahamQty"></strong><span id="grahamCoverage"></span></div>
+</div>
+
+<div class="result">
+<div class="icon">🍫</div>
+<div><div class="result-title">Standard Hershey Bars</div><div class="math" id="chocMath"></div></div>
+<div class="qty"><strong id="chocQty"></strong><span id="chocCoverage"></span></div>
+</div>
+
+</div>
+
+<div class="assumptions">
+<strong>Current serving assumptions</strong><br>
+1 person = 1 s'more<br>
+1 × 12 oz marshmallow bag = 40 s'mores<br>
+1 graham cracker box = 28 s'mores<br>
+1 standard Hershey bar = 2 s'mores
+</div>
+
+<div class="note">Package quantities always round up so the group is not short.</div>
+</section>
+</div>
+
+<footer>HMSR Campmaster Program · Supply Planning Tool</footer>
+</div>
+
+<script>
+const youth=document.getElementById('youth');
+const adults=document.getElementById('adults');
+const SERVINGS={marshmallows:40,grahams:28,chocolate:2};
+
+function safeInt(v){const n=parseInt(v,10);return Number.isFinite(n)&&n>0?n:0}
+
+function formatMath(total,perPackage,packageName){
+  if(total===0)return "0 s'mores needed";
+  const exact=total/perPackage;
+  const suffix=Number.isInteger(exact)?"":" → round up";
+  return `${total} s'mores ÷ ${perPackage} per ${packageName} = ${exact.toFixed(2)}${suffix}`;
+}
+
+function update(){
+  const total=safeInt(youth.value)+safeInt(adults.value);
+  const marsh=total===0?0:Math.ceil(total/SERVINGS.marshmallows);
+  const graham=total===0?0:Math.ceil(total/SERVINGS.grahams);
+  const choc=total===0?0:Math.ceil(total/SERVINGS.chocolate);
+
+  document.getElementById('total').textContent=total;
+  document.getElementById('marshQty').textContent=marsh;
+  document.getElementById('grahamQty').textContent=graham;
+  document.getElementById('chocQty').textContent=choc;
+
+  document.getElementById('marshMath').textContent=formatMath(total,SERVINGS.marshmallows,'bag');
+  document.getElementById('grahamMath').textContent=formatMath(total,SERVINGS.grahams,'box');
+  document.getElementById('chocMath').textContent=formatMath(total,SERVINGS.chocolate,'bar');
+
+  document.getElementById('marshCoverage').textContent=`covers ${marsh*SERVINGS.marshmallows} s'mores`;
+  document.getElementById('grahamCoverage').textContent=`covers ${graham*SERVINGS.grahams} s'mores`;
+  document.getElementById('chocCoverage').textContent=`covers ${choc*SERVINGS.chocolate} s'mores`;
+}
+
+youth.addEventListener('input',update);
+adults.addEventListener('input',update);
+document.getElementById('reset').addEventListener('click',()=>{youth.value=0;adults.value=0;youth.focus();update()});
+update();
+</script>
+</body>
+</html>
