@@ -37,6 +37,131 @@ input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(230,185,75,.15)
 button{margin-top:14px;width:100%;border:1px solid var(--border);background:rgba(255,255,255,.07);color:var(--text);border-radius:14px;padding:12px 16px;font-size:15px;font-weight:800;cursor:pointer}
 footer{margin-top:20px;color:rgba(255,255,255,.55);font-size:12px;text-align:center}
 @media(max-width:760px){body{padding:18px}.grid{grid-template-columns:1fr}.result{grid-template-columns:44px 1fr}.qty{grid-column:2;text-align:left}}
+
+@media print{
+  @page{size:letter portrait;margin:.45in}
+
+  body{
+    background:#fff!important;
+    color:#000!important;
+    padding:0!important;
+    min-height:auto!important;
+    font-family:Arial,Helvetica,sans-serif;
+  }
+
+  .wrap{max-width:none!important;margin:0!important}
+  .eyebrow{color:#000!important;font-size:10pt!important;letter-spacing:.08em!important;margin-bottom:3px!important}
+  h1{color:#000!important;font-size:22pt!important;margin:0 0 4px!important}
+  .subtitle,.assumptions,.note,footer,#reset{display:none!important}
+
+  .grid{display:block!important;margin-top:10px!important}
+  .card{
+    background:#fff!important;
+    border:0!important;
+    border-radius:0!important;
+    padding:0!important;
+    box-shadow:none!important;
+    margin:0!important;
+  }
+
+  .card:first-of-type{
+    margin-bottom:10px!important;
+    padding-bottom:8px!important;
+    border-bottom:2px solid #000!important;
+  }
+
+  .card h2{
+    color:#000!important;
+    font-size:14pt!important;
+    margin:0 0 8px!important;
+  }
+
+  .attendance-inputs{
+    display:grid!important;
+    grid-template-columns:2fr 1fr 1fr!important;
+    gap:14px!important;
+  }
+
+  .field{margin-bottom:6px!important}
+  label{color:#000!important;font-size:9pt!important;margin-bottom:2px!important}
+
+  input{
+    background:#fff!important;
+    color:#000!important;
+    border:0!important;
+    border-bottom:1px solid #000!important;
+    border-radius:0!important;
+    padding:2px 0!important;
+    font-size:11pt!important;
+  }
+
+  .total-box{
+    background:#fff!important;
+    border:0!important;
+    border-radius:0!important;
+    padding:4px 0 0!important;
+    margin-top:4px!important;
+  }
+
+  .total-label{color:#000!important;font-size:8pt!important}
+  .total-number{color:#000!important;font-size:20pt!important}
+  .total-caption{color:#000!important;font-size:8pt!important}
+
+  .results{display:block!important}
+
+  .result{
+    background:#fff!important;
+    border:0!important;
+    border-bottom:1px solid #bbb!important;
+    border-radius:0!important;
+    padding:8px 0!important;
+    grid-template-columns:32px 1fr 105px!important;
+    break-inside:avoid;
+  }
+
+  .icon{font-size:17pt!important}
+  .result-title{color:#000!important;font-size:11pt!important}
+  .math{color:#333!important;font-size:8.5pt!important}
+  .qty{text-align:right!important;min-width:0!important}
+  .qty strong{color:#000!important;font-size:17pt!important}
+  .qty span{color:#333!important;font-size:7.5pt!important}
+
+  .print-only{display:block!important}
+
+  .packing-title{
+    margin-top:12px!important;
+    font-size:12pt!important;
+    font-weight:700!important;
+  }
+
+  .checkline{
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+    margin-top:8px!important;
+    font-size:9.5pt!important;
+  }
+
+  .checkbox{
+    width:13px!important;
+    height:13px!important;
+    border:1.4px solid #000!important;
+    display:inline-block!important;
+    flex:0 0 auto!important;
+  }
+
+  .serving-note{
+    margin-top:12px!important;
+    padding-top:8px!important;
+    border-top:1px solid #999!important;
+    font-size:8.5pt!important;
+    line-height:1.4!important;
+    color:#000!important;
+  }
+}
+
+.print-only{display:none}
+
 </style>
 </head>
 <body>
@@ -48,8 +173,20 @@ footer{margin-top:20px;color:rgba(255,255,255,.55);font-size:12px;text-align:cen
 <div class="grid">
 <section class="card">
 <h2>Weekend Attendance</h2>
-<div class="field"><label for="youth">Youth attending</label><input id="youth" type="number" min="0" step="1" value="24"></div>
-<div class="field"><label for="adults">Adults attending</label><input id="adults" type="number" min="0" step="1" value="8"></div>
+<div class="attendance-inputs">
+  <div class="field">
+    <label for="unitName">Unit / Group</label>
+    <input id="unitName" type="text" placeholder="Example: Pack 123">
+  </div>
+  <div class="field">
+    <label for="youth">Youth attending</label>
+    <input id="youth" type="number" min="0" step="1" value="24">
+  </div>
+  <div class="field">
+    <label for="adults">Adults attending</label>
+    <input id="adults" type="number" min="0" step="1" value="8">
+  </div>
+</div>
 <div class="total-box">
 <div class="total-label">Total people</div>
 <div class="total-number" id="total">32</div>
@@ -86,6 +223,23 @@ footer{margin-top:20px;color:rgba(255,255,255,.55);font-size:12px;text-align:cen
 <div class="qty"><strong id="stickQty"></strong><span>1 per person</span></div>
 </div>
 
+</div>
+
+
+<div class="print-only">
+  <div class="packing-title">Packing Checklist</div>
+  <div class="checkline"><span class="checkbox"></span><span id="printMarsh">Marshmallows</span></div>
+  <div class="checkline"><span class="checkbox"></span><span id="printGraham">Graham crackers</span></div>
+  <div class="checkline"><span class="checkbox"></span><span id="printChoc">Chocolate bars</span></div>
+  <div class="checkline"><span class="checkbox"></span><span id="printSticks">Roasting sticks</span></div>
+
+  <div class="serving-note">
+    <strong>HMSR serving sizes:</strong>
+    1 marshmallow per person ·
+    1/2 chocolate bar per person ·
+    1 graham cracker sheet per person ·
+    1 roasting stick per person
+  </div>
 </div>
 
 <div class="assumptions">
@@ -139,11 +293,29 @@ function update(){
   document.getElementById('marshCoverage').textContent=`covers ${marsh*SERVINGS.marshmallows} s'mores`;
   document.getElementById('grahamCoverage').textContent=`covers ${graham*SERVINGS.grahams} s'mores`;
   document.getElementById('chocCoverage').textContent=`covers ${choc*SERVINGS.chocolate} s'mores`;
+
+  document.getElementById('printMarsh').textContent =
+    `${marsh} × 12 oz marshmallow bag${marsh === 1 ? '' : 's'}`;
+
+  document.getElementById('printGraham').textContent =
+    `${graham} × 14.4 oz graham cracker box${graham === 1 ? '' : 'es'}`;
+
+  document.getElementById('printChoc').textContent =
+    `${choc} × standard Hershey bar${choc === 1 ? '' : 's'}`;
+
+  document.getElementById('printSticks').textContent =
+    `${sticks} × roasting stick${sticks === 1 ? '' : 's'}`;
 }
 
 youth.addEventListener('input',update);
 adults.addEventListener('input',update);
-document.getElementById('reset').addEventListener('click',()=>{youth.value=0;adults.value=0;youth.focus();update()});
+document.getElementById('reset').addEventListener('click',()=>{
+  document.getElementById('unitName').value='';
+  youth.value=0;
+  adults.value=0;
+  document.getElementById('unitName').focus();
+  update();
+});
 update();
 </script>
 </body>
