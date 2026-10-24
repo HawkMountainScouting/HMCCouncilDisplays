@@ -190,7 +190,7 @@ footer{margin-top:20px;color:rgba(255,255,255,.55);font-size:12px;text-align:cen
 <div class="total-box">
 <div class="total-label">Total people</div>
 <div class="total-number" id="total">32</div>
-<div class="total-caption">1 s'more and 1 roasting stick per person</div>
+<div class="total-caption">1 s'more per person · 1 roasting stick per 2 people</div>
 </div>
 <button id="reset" type="button">Reset for next group</button>
 </section>
@@ -207,7 +207,7 @@ footer{margin-top:20px;color:rgba(255,255,255,.55);font-size:12px;text-align:cen
 
 <div class="result">
 <div class="icon">🍪</div>
-<div><div class="result-title">14.4 oz Graham Cracker Boxes</div><div class="math" id="grahamMath"></div></div>
+<div><div class="result-title">Graham Cracker Sleeves</div><div class="math" id="grahamMath"></div></div>
 <div class="qty"><strong id="grahamQty"></strong><span id="grahamCoverage"></span></div>
 </div>
 
@@ -220,7 +220,7 @@ footer{margin-top:20px;color:rgba(255,255,255,.55);font-size:12px;text-align:cen
 <div class="result">
 <div class="icon">🔥</div>
 <div><div class="result-title">Roasting Sticks</div><div class="math" id="stickMath"></div></div>
-<div class="qty"><strong id="stickQty"></strong><span>1 per person</span></div>
+<div class="qty"><strong id="stickQty"></strong><span>1 per 2 people</span></div>
 </div>
 
 </div>
@@ -236,9 +236,9 @@ footer{margin-top:20px;color:rgba(255,255,255,.55);font-size:12px;text-align:cen
   <div class="serving-note">
     <strong>HMSR serving sizes:</strong>
     1 marshmallow per person ·
-    1/2 chocolate bar per person ·
-    1 graham cracker sheet per person ·
-    1 roasting stick per person
+    1/4 chocolate bar per person ·
+    1 graham cracker sleeve per 9 people ·
+    1 roasting stick per 2 people
   </div>
 </div>
 
@@ -246,9 +246,9 @@ footer{margin-top:20px;color:rgba(255,255,255,.55);font-size:12px;text-align:cen
 <strong>Current serving assumptions</strong><br>
 1 person = 1 s'more<br>
 1 × 12 oz marshmallow bag = 40 s'mores<br>
-1 × 14.4 oz graham cracker box = 27 s'mores<br>
-1 standard Hershey bar = 2 s'mores<br>
-1 roasting stick = 1 person
+1 graham cracker sleeve = 9 s'mores<br>
+1 standard Hershey bar = 4 s'mores<br>
+1 roasting stick = 2 people
 </div>
 
 <div class="note">Package quantities always round up so the group is not short.</div>
@@ -261,7 +261,7 @@ footer{margin-top:20px;color:rgba(255,255,255,.55);font-size:12px;text-align:cen
 <script>
 const youth=document.getElementById('youth');
 const adults=document.getElementById('adults');
-const SERVINGS={marshmallows:40,grahams:27,chocolate:2};
+const SERVINGS={marshmallows:40,grahams:9,chocolate:4};
 
 function safeInt(v){const n=parseInt(v,10);return Number.isFinite(n)&&n>0?n:0}
 
@@ -277,7 +277,7 @@ function update(){
   const marsh=total===0?0:Math.ceil(total/SERVINGS.marshmallows);
   const graham=total===0?0:Math.ceil(total/SERVINGS.grahams);
   const choc=total===0?0:Math.ceil(total/SERVINGS.chocolate);
-  const sticks=total;
+  const sticks=Math.ceil(total/2);
 
   document.getElementById('total').textContent=total;
   document.getElementById('marshQty').textContent=marsh;
@@ -286,9 +286,9 @@ function update(){
   document.getElementById('stickQty').textContent=sticks;
 
   document.getElementById('marshMath').textContent=formatMath(total,SERVINGS.marshmallows,'bag');
-  document.getElementById('grahamMath').textContent=formatMath(total,SERVINGS.grahams,'box');
+  document.getElementById('grahamMath').textContent=formatMath(total,SERVINGS.grahams,'sleeve');
   document.getElementById('chocMath').textContent=formatMath(total,SERVINGS.chocolate,'bar');
-  document.getElementById('stickMath').textContent=`${total} people × 1 stick each = ${sticks} sticks`;
+  document.getElementById('stickMath').textContent=`${total} people ÷ 2 per stick = ${sticks} sticks (rounded up)`;
 
   document.getElementById('marshCoverage').textContent=`covers ${marsh*SERVINGS.marshmallows} s'mores`;
   document.getElementById('grahamCoverage').textContent=`covers ${graham*SERVINGS.grahams} s'mores`;
@@ -298,7 +298,7 @@ function update(){
     `${marsh} × 12 oz marshmallow bag${marsh === 1 ? '' : 's'}`;
 
   document.getElementById('printGraham').textContent =
-    `${graham} × 14.4 oz graham cracker box${graham === 1 ? '' : 'es'}`;
+    `${graham} × graham cracker sleeve${graham === 1 ? '' : 's'}`;
 
   document.getElementById('printChoc').textContent =
     `${choc} × standard Hershey bar${choc === 1 ? '' : 's'}`;
