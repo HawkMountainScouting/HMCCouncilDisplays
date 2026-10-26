@@ -322,7 +322,7 @@
       </div>
 
       <div id="currentDetail">
-        Wind -- · Humidity -- · Updated --
+        Humidity -- · Updated --
       </div>
     </section>
 
@@ -395,11 +395,6 @@
     return Math.round((c * 9 / 5) + 32);
   }
 
-  function formatWindDirection(deg) {
-    if (deg === null || deg === undefined || Number.isNaN(deg)) return "";
-    const dirs = ["N","NE","E","SE","S","SW","W","NW"];
-    return dirs[Math.round(deg / 45) % 8];
-  }
 
   async function getJSON(url) {
     const response = await fetch(url, {
@@ -501,13 +496,6 @@
           ? windChillF
           : tempF;
 
-    const windMps = obs?.windSpeed?.value;
-    const windMph =
-      windMps !== null && windMps !== undefined
-        ? Math.round(windMps * 2.23694)
-        : null;
-
-    const windDir = formatWindDirection(obs?.windDirection?.value);
 
     $("temperature").innerHTML =
       `${tempF ?? "--"}<span class="degree">°</span>`;
@@ -522,12 +510,6 @@
       weatherEmoji(description, hourly?.isDaytime !== false);
 
     const details = [];
-
-    if (windMph !== null) {
-      details.push(`Wind ${windDir ? windDir + " " : ""}${windMph} mph`);
-    } else if (hourly?.windSpeed) {
-      details.push(`Wind ${hourly.windDirection || ""} ${hourly.windSpeed}`.trim());
-    }
 
     if (humidity !== null) {
       details.push(`Humidity ${humidity}%`);
