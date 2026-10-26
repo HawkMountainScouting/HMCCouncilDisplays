@@ -432,23 +432,45 @@
 
       const hourly = hourlyData.properties.periods?.[0];
 
-      // 3) Get nearest reporting station's latest observation.
-      let observation = null;
+      // 3) Check nearby stations in distance order, preferring fresh observations.
+      // NWS normally returns stations ordered by proximity to the requested point.
+      const MAX_OBSERVATION_AGE_MS = 2 * 60 * 60 * 1000;
+      const MAX_STATIONS_TO_CHECK = 8;
+      const stations = (stationsData.features || [])
+        .map(feature => feature.properties?.stationIdentifier)
+        .filter(Boolean)
+        .slice(0, MAX_STATIONS_TO_CHECK);
 
-      if (stationsData.features && stationsData.features.length) {
-        const stationID = stationsData.features[0].properties.stationIdentifier;
-
+      // Fetch concurrently so a slow station does not block checking the others.
+      const candidates = await Promise.all(stations.map(async stationID => {
         try {
-          const obsData = await getJSON(
-            `https://api.weather.gov/stations/${stationID}/observations/latest`
+          const data = await getJSON(
+            `https://api.weather.gov/stations/${encodeURIComponent(stationID)}/observations/latest`
           );
-          observation = obsData.properties;
-        } catch (e) {
-          console.warn("Observation unavailable; using hourly forecast.", e);
+          return { stationID, observation: data.properties };
+        } catch (error) {
+          console.warn(`Station ${stationID} unavailable`, error);
+          return null;
         }
+      }));
+
+      const now = Date.now();
+      const selected = candidates.find(candidate => {
+        const obs = candidate?.observation;
+        const time = Date.parse(obs?.timestamp || "");
+        return Number.isFinite(time) &&
+          time <= now + 5 * 60 * 1000 &&
+          now - time <= MAX_OBSERVATION_AGE_MS &&
+          obs?.temperature?.value != null;
+      });
+
+      if (selected) {
+        console.info(`Using fresh NWS observation from ${selected.stationID}`);
+      } else {
+        console.warn("No recent nearby station observation; using hourly forecast estimate.");
       }
 
-      renderCurrent(observation, hourly);
+      renderCurrent(selected?.observation || null, hourly);
       renderForecast(forecastData.properties.periods || []);
 
       $("status").textContent =
@@ -515,16 +537,14 @@
       details.push(`Humidity ${humidity}%`);
     }
 
-    const updatedTime = obs?.timestamp
-      ? new Date(obs.timestamp)
-      : new Date();
-
-    details.push(
-      `Observed ${updatedTime.toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "2-digit"
-      })}`
-    );
+    if (obs?.timestamp) {
+      const observedAt = new Date(obs.timestamp);
+      details.push(`Observed ${observedAt.toLocaleString([], {
+        month: "short", day: "numeric", hour: "numeric", minute: "2-digit"
+      })}`);
+    } else {
+      details.push("Forecast Estimate (no recent station observation)");
+    }
 
     $("currentDetail").textContent = details.join("  ·  ");
   }
