@@ -21,8 +21,61 @@ body{background:radial-gradient(ellipse at 90% 0%,#d7f2ed 0%,transparent 42%),ra
 .footer{color:#567483}.footer a{color:#167f83}button{background:#fff;border:1px solid #cbdedc;color:#174457;box-shadow:0 2px 6px #214a5b0b}button:hover{background:#e8f6f2}
 .empty{color:#567483}.errornote{color:#ad583d}
 @media (min-width:851px) and (max-height:950px){.feature{min-height:0}.listpanel{min-height:0}.shell{padding-top:14px;padding-bottom:12px}.heading{margin:14px 0}.feature h3{font-size:clamp(23px,2.3vw,36px)}.event{padding:8px 3px;min-height:0}.feature-foot{padding-top:16px}.feature-date{margin-top:15px}.footer{margin-top:10px}}
-</style></head><body><main class="shell"><header class="top"><div class="brand"><div class="emblem" aria-hidden="true">H</div><div><div class="eyebrow">SCOUTING AMERICA</div><h1>Hawk Mountain Council</h1><small>ADVENTURE · LEADERSHIP · SERVICE</small></div></div><div class="clock"><strong id="clock">--:--</strong><span id="today">Loading date</span></div></header><div class="heading"><div><h2>Family Adventures<span style="color:#d9b86f">.</span></h2><p>Explore upcoming programs and adventures with Hawk Mountain Council.</p></div><div class="status"><span class="dot" id="dot"></span><span id="status">Loading council calendar…</span></div></div><section class="layout"><article class="feature"><div class="tag">✦ &nbsp; Next on the calendar</div><div class="feature-date"><div class="datebox"><span class="mon" id="featureMonth">—</span><span class="day" id="featureDay">—</span></div><div class="detail" id="featureWhen">Checking for upcoming events</div></div><h3 id="featureTitle">Connecting to the council calendar…</h3><div class="detail" id="featureLocation">Events will appear here automatically.</div><div class="feature-foot"><span class="countdown" id="countdown">LIVE CALENDAR</span><a class="link" id="featureLink" href="https://scoutcal.com/18768" target="_blank" rel="noopener">View calendar ↗</a></div></article><section class="listpanel"><div class="listhead"><h3>On the Horizon</h3><span id="eventCount">Next events</span></div><div class="events" id="events"><div class="empty">Loading the latest calendar events…</div></div><div class="errornote" id="error"></div></section></section><footer class="footer"><span>Hawk Mountain Council · Powered by the ScoutCal calendar feed</span><div class="controls"><span id="updated">Waiting for first update</span><button id="refresh" type="button">↻ Refresh</button><button id="fullscreen" type="button">⛶ Full screen</button></div></footer></main><script>
-'use strict';const FEED='./events.json',CAL='https://scoutcal.com/18768';const $=id=>document.getElementById(id);const zone='America/New_York';let last=[];
+
+/* Lobby TV refresh: compact feature, modestly larger list type, and reserved Airtame ticker clearance. */
+.shell{max-width:1920px}
+.feature{min-height:0}
+.feature-date{margin-top:22px}
+.feature h3{font-size:clamp(27px,2.5vw,43px);margin:18px 0 12px}
+.feature-foot{padding-top:18px}
+.listpanel{min-height:0;display:flex;flex-direction:column}
+.event{padding:13px 4px;min-height:0}
+.event-info strong{font-size:clamp(16px,1.2vw,21px)}
+.event-info small{font-size:clamp(12px,.85vw,15px);margin-top:5px}
+.mini-date b{font-size:26px}
+.rotation-note{margin-top:auto;padding:10px 4px 0;color:#567483;font-size:12px;text-align:right}
+@media (min-width:851px){
+  html,body{height:100%;overflow:hidden}
+  .shell{height:100dvh;display:flex;flex-direction:column;padding:clamp(12px,1.5vw,24px) clamp(20px,3vw,55px) 62px}
+  .top{flex:none;padding-bottom:12px}
+  .heading{flex:none;margin:14px 0 15px}
+  .heading h2{font-size:clamp(31px,2.8vw,46px)}
+  .layout{flex:1;min-height:0;grid-template-columns:minmax(0,.93fr) minmax(0,1.07fr);gap:18px}
+  .feature,.listpanel{height:100%;min-height:0}
+  .feature{padding:clamp(19px,2vw,30px)}
+  .feature-date{margin-top:clamp(14px,2vh,26px)}
+  .feature h3{font-size:clamp(27px,2.45vw,43px)}
+  .listpanel{padding:clamp(14px,1.5vw,24px)}
+  .events{flex:1;min-height:0;justify-content:space-evenly}
+  .event{flex:1;max-height:110px;padding:8px 4px;gap:15px}
+  .footer{display:none}
+}
+@media (min-width:851px) and (max-height:750px){
+  .shell{padding-top:9px;padding-bottom:48px}
+  .emblem{width:47px;height:47px;font-size:25px}
+  .heading{margin:8px 0 10px}
+  .heading h2{font-size:30px}
+  .heading p{margin-top:3px;font-size:12px}
+  .feature-date{margin-top:12px}
+  .datebox{width:76px;min-width:76px;padding:7px}
+  .datebox .day{font-size:34px}
+  .feature h3{font-size:28px;margin:12px 0 8px}
+  .detail{font-size:14px}
+  .event-info strong{font-size:16px}
+  .event-info small{font-size:12px}
+  .mini-date b{font-size:21px}
+  .rotation-note{padding-top:4px}
+}
+@media (max-width:850px){
+  html,body{height:auto;overflow:auto}
+  .shell{padding-bottom:24px}
+  .events{display:flex;flex-direction:column}
+  .event-info strong{font-size:17px}
+  .event-info small{font-size:13px}
+  .footer{display:flex}
+}
+</style></head><body><main class="shell"><header class="top"><div class="brand"><div class="emblem" aria-hidden="true">H</div><div><div class="eyebrow">SCOUTING AMERICA</div><h1>Hawk Mountain Council</h1><small>ADVENTURE · LEADERSHIP · SERVICE</small></div></div><div class="clock"><strong id="clock">--:--</strong><span id="today">Loading date</span></div></header><div class="heading"><div><h2>Family Adventures<span style="color:#d9b86f">.</span></h2><p>Explore upcoming programs and adventures with Hawk Mountain Council.</p></div><div class="status"><span class="dot" id="dot"></span><span id="status">Loading council calendar…</span></div></div><section class="layout"><article class="feature"><div class="tag">✦ &nbsp; Next on the calendar</div><div class="feature-date"><div class="datebox"><span class="mon" id="featureMonth">—</span><span class="day" id="featureDay">—</span></div><div class="detail" id="featureWhen">Checking for upcoming events</div></div><h3 id="featureTitle">Connecting to the council calendar…</h3><div class="detail" id="featureLocation">Events will appear here automatically.</div><div class="feature-foot"><span class="countdown" id="countdown">LIVE CALENDAR</span><a class="link" id="featureLink" href="https://scoutcal.com/18768" target="_blank" rel="noopener">View calendar ↗</a></div></article><section class="listpanel"><div class="listhead"><h3>On the Horizon</h3><span id="eventCount">Next events</span></div><div class="events" id="events"><div class="empty">Loading the latest calendar events…</div></div><div class="rotation-note" id="rotationNote" aria-live="off"></div><div class="errornote" id="error"></div></section></section><footer class="footer"><span>Hawk Mountain Council · Powered by the ScoutCal calendar feed</span><div class="controls"><span id="updated">Waiting for first update</span><button id="refresh" type="button">↻ Refresh</button><button id="fullscreen" type="button">⛶ Full screen</button></div></footer></main><script>
+'use strict';const FEED='./events.json',CAL='https://scoutcal.com/18768';const $=id=>document.getElementById(id);const zone='America/New_York';let last=[];let currentEvents=[];let page=0;const PAGE_SIZE=5;const ROTATE_MS=18000;
 function dateFrom(v){if(v==null)return null;if(typeof v==='number')return new Date(v<1e11?v*1000:v);if(typeof v==='object'){if(v.dateTime||v.date)return dateFrom(v.dateTime||v.date);if(v.timestamp)return dateFrom(v.timestamp)}if(typeof v!=='string')return null;let s=v.trim();if(/^\d{8}T\d{6}$/.test(s))s=s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6,8)+'T'+s.slice(9,11)+':'+s.slice(11,13)+':'+s.slice(13,15);else if(/^\d{8}$/.test(s))s=s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6,8)+'T12:00:00';else if(/^\d{4}-\d{2}-\d{2}$/.test(s))s+='T12:00:00';let d=new Date(s);return isNaN(d)?null:d}
 function first(obj,keys){for(const k of keys){let v=k.split('.').reduce((o,p)=>o?.[p],obj);if(v!==undefined&&v!==null&&v!=='')return v}return null}
 function plain(s){if(s==null)return '';const d=document.createElement('div');d.innerHTML=String(s);return (d.textContent||'').replace(/\s+/g,' ').trim()}
@@ -33,15 +86,35 @@ function fmt(d,opts){return new Intl.DateTimeFormat('en-US',{timeZone:zone,...op
 const ADMIN_TITLE_PATTERNS=[
   /\b(?:district|council|executive|program|membership|finance|advancement|properties|camping|activities|range and target|safety|endowment)\s+committee\s+meetings?\b/i,
   /\bcommittee\s+meetings?\b/i,
-  /\b(?:board|cabinet|staff|commissioner|key\s*3|key\s*three|district\s+membership|district\s+executive)\s+meetings?\b/i,
+  /\b(?:board|cabinet|staff|commissioners?|key\s*3|key\s*three|district\s+membership|district\s+executive)\s+meetings?\b/i,
+  /\b(?:district|council|unit)\s+commissioners?\s+meetings?\b/i,
+  /\b(?:christmas|thanksgiving|columbus|labor|veterans|independence|memorial|presidents?)\s+day\b/i,
+  /\b(?:lodge|oa)\s+dues\b|\bannual\s+oa\s+dues\b/i,
+  /\boffice\s+clos(?:ed|ing|ure)\b/i,
   /\b(?:district|council)\s+roundtables?\b/i,
   /\broundtables?\b/i,
   /\b(?:board|committee)\s+of\s+directors\s+meetings?\b/i,
   /\b(?:budget|planning)\s+committee\b/i
 ];
 function isFamilyFacing(e){return !ADMIN_TITLE_PATTERNS.some(pattern=>pattern.test(e.title));}
-function render(events){let t=now();let upcoming=events.filter(e=>isFamilyFacing(e)&&(e.end||new Date(e.start.getTime()+86400000))>=t);last=upcoming;let head=upcoming[0];$('eventCount').textContent=upcoming.length+' upcoming';if(!head){$('featureTitle').textContent='No upcoming events listed';$('featureWhen').textContent='Check back soon';$('featureLocation').textContent='New events will appear automatically as they are published.';$('featureMonth').textContent='—';$('featureDay').textContent='—';$('countdown').textContent='STAY TUNED';$('events').replaceChildren(el('div','empty','No future events were found in the feed.'));return}let diff=Math.max(0,Math.ceil((head.start-t)/86400000));$('featureMonth').textContent=fmt(head.start,{month:'short'}).toUpperCase();$('featureDay').textContent=fmt(head.start,{day:'2-digit'});$('featureWhen').textContent=fmt(head.start,{weekday:'long',month:'long',day:'numeric',year:'numeric'});$('featureTitle').textContent=head.title;$('featureLocation').textContent=head.loc||'See event details on the council calendar';$('countdown').textContent=diff===0?'HAPPENING SOON':diff===1?'TOMORROW':diff+' DAYS AWAY';$('featureLink').href=head.url;let wrap=$('events');wrap.replaceChildren();for(const e of upcoming.slice(1,8)){let row=el('div','event'),dt=el('div','mini-date'),day=el('b','',fmt(e.start,{day:'2-digit'})),mon=el('span','',fmt(e.start,{month:'short'}).toUpperCase()),info=el('div','event-info'),title=el('strong','',e.title),details=el('small','',fmt(e.start,{weekday:'short',month:'short',day:'numeric'})+(e.loc?' · '+e.loc:'')),link=el('a','','↗');link.href=e.url;link.target='_blank';link.rel='noopener';link.setAttribute('aria-label','View '+e.title);dt.append(mon,day);info.append(title,details);row.append(dt,info,link);wrap.append(row)}if(upcoming.length===1)wrap.append(el('div','empty','More upcoming events will appear here when added to the calendar.'))}
+function drawPage(){
+ const wrap=$('events');wrap.replaceChildren();
+ const remainder=currentEvents.slice(1),pages=Math.max(1,Math.ceil(remainder.length/PAGE_SIZE));
+ if(page>=pages)page=0;
+ for(const e of remainder.slice(page*PAGE_SIZE,(page+1)*PAGE_SIZE)){
+  let row=el('div','event'),dt=el('div','mini-date'),day=el('b','',fmt(e.start,{day:'2-digit'})),mon=el('span','',fmt(e.start,{month:'short'}).toUpperCase()),info=el('div','event-info'),title=el('strong','',e.title),details=el('small','',fmt(e.start,{weekday:'short',month:'short',day:'numeric'})+(e.loc?' · '+e.loc:'')),link=el('a','','↗');
+  link.href=e.url;link.target='_blank';link.rel='noopener';link.setAttribute('aria-label','View '+e.title);dt.append(mon,day);info.append(title,details);row.append(dt,info,link);wrap.append(row);
+ }
+ if(!remainder.length)wrap.append(el('div','empty','More upcoming events will appear here when added to the calendar.'));
+ $('rotationNote').textContent=pages>1?'Showing '+(page+1)+' of '+pages+' · Rotates every 18 seconds':'';
+}
+function render(events){
+ let t=now();let upcoming=events.filter(e=>isFamilyFacing(e)&&(e.end||new Date(e.start.getTime()+86400000))>=t);
+ last=upcoming;currentEvents=upcoming;page=0;let head=upcoming[0];$('eventCount').textContent=upcoming.length+' upcoming';
+ if(!head){$('featureTitle').textContent='No upcoming events listed';$('featureWhen').textContent='Check back soon';$('featureLocation').textContent='New events will appear automatically as they are published.';$('featureMonth').textContent='—';$('featureDay').textContent='—';$('countdown').textContent='STAY TUNED';$('events').replaceChildren(el('div','empty','No future events were found in the feed.'));$('rotationNote').textContent='';return}
+ let diff=Math.max(0,Math.ceil((head.start-t)/86400000));$('featureMonth').textContent=fmt(head.start,{month:'short'}).toUpperCase();$('featureDay').textContent=fmt(head.start,{day:'2-digit'});$('featureWhen').textContent=fmt(head.start,{weekday:'long',month:'long',day:'numeric'});$('featureTitle').textContent=head.title;$('featureLocation').textContent=head.loc||'See event details on the council calendar';$('countdown').textContent=diff===0?'HAPPENING SOON':diff===1?'TOMORROW':diff+' DAYS AWAY';$('featureLink').href=head.url;drawPage();
+}
 function setStatus(text,kind){$('status').textContent=text;$('dot').className='dot '+(kind||'')}
 async function load(){setStatus('Updating calendar…','');try{let r=await fetch(FEED+'?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);let data=await r.json();let parsed=normalize(data);if(!parsed.length){console.info('Feed response:',data);throw new Error('No recognizable events in JSON. Feed structure may require an adapter.')}render(parsed);setStatus('Calendar connected','good');$('updated').textContent='Updated '+fmt(now(),{hour:'numeric',minute:'2-digit'});$('error').classList.remove('visible')}catch(err){console.error('Calendar connection:',err);setStatus('Calendar connection unavailable','bad');$('error').textContent='Calendar data could not be displayed: '+err.message;$('error').classList.add('visible');$('updated').textContent='Update failed';if(!last.length){$('featureTitle').textContent='Calendar update pending';$('featureWhen').textContent='Waiting for first sync';$('featureLocation').textContent='Open the calendar link to see current events.';$('events').replaceChildren(el('div','empty','The calendar data has not been published yet. Check GitHub Actions.'))}}}
-$('refresh').addEventListener('click',load);$('fullscreen').addEventListener('click',()=>{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen?.()});clock();setInterval(clock,30000);load();setInterval(load,15*60*1000);
+$('refresh').addEventListener('click',load);$('fullscreen').addEventListener('click',()=>{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen?.()});clock();setInterval(clock,30000);load();setInterval(load,15*60*1000);setInterval(()=>{if(currentEvents.length>PAGE_SIZE+1){page++;drawPage()}},ROTATE_MS);
 </script></body></html>
